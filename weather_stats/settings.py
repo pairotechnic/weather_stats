@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    'weather',
+    'rest_framework',
+    'django_filters'
 ]
 
 MIDDLEWARE = [
@@ -128,3 +132,50 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+
+CELERY_BROKER_URL = os.getenv("WSL_CELERY_BROKER_URL")
+CELERY_BEAT_SCHEDULE = {
+    'fetch-weather-every-30-seconds' : {
+        'task' : 'weather.tasks.fetch_weather_data',
+        'schedule' : 30.0
+    }
+}
+
+'''
+    Average time taken to update data : 
+
+    Barcelona: 458 seconds (~6.38 minutes)
+    Hong Kong: 411.6 seconds (~6.51 minutes)
+    Singapore: 525 seconds (~6.82 minutes)
+    New York: 423.2 seconds (~6.94 minutes)
+    London: 419.5 seconds (~7.17 minutes)
+    Tokyo: 392.86 seconds (~7.53 minutes)
+    Bangkok: 545.4 seconds (~7.61 minutes)
+    Paris: 361.17 seconds (~7.73 minutes)
+    Istanbul: 651.5 seconds (~7.75 minutes)
+    Dubai: 393.5 seconds (~9.18 minutes)
+
+    API Free Plan limitations : 
+
+    60 API calls/minute
+    1,000,000 calls/month
+
+    Monthly limit mapped to minute : 
+    23 calls/minute ( recommended limit )
+
+    For maximum granularity ( and staying within monthly limits )
+    I can make 10 calls every 30 seconds
+
+    To maintain reasonable granularity, but save a lot of resoures
+    I can make 10 calls every 5 minutes
+
+'''
+
+REDIS_HOST = os.getenv('WSL_IP')
+REDIS_PORT = 6379
+REDIS_DB = 0

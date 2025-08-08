@@ -1,3 +1,6 @@
 __pycache__/
 db.sqlite3
 .env
+.vscode/
+sandbox/
+celerybeat-schedule*
