@@ -1,16 +1,14 @@
 import redis
 from django.conf import settings
 
-# Initialize Redis connection pool
-redis_pool = redis.ConnectionPool(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    db=settings.REDIS_DB,
-    decode_responses=True
-)
-
 def get_redis_client():
-    '''
-    Retrieves a Redis client from the connection pool
-    '''
-    return redis.Redis(connection_pool=redis_pool)
+    
+    return redis.Redis(
+        host = settings.REDIS_CONFIG["HOST"],
+        port = settings.REDIS_CONFIG["PORT"],
+        db = settings.REDIS_CONFIG["DB"],
+        ssl = settings.REDIS_CONFIG["SSL"],
+        decode_responses = True,
+        socket_connect_timeout = 5
+    )
+    

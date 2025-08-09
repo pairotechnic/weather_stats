@@ -53,6 +53,8 @@ def fetch_and_store_all_cities():
         "New York", "Barcelona"
     ]
 
+    updated_cities = []
+
     redis_client = get_redis_client()
 
     for city in cities:
@@ -90,3 +92,6 @@ def fetch_and_store_all_cities():
             measured_at=weather_data["measured_at"]
         )
         redis_client.set(redis_key, weather_data["measured_at"].isoformat())
+        updated_cities.append(city)
+
+    return updated_cities

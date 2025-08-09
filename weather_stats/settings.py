@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import dj_database_url
+import urllib.parse
 
 load_dotenv()
 
@@ -24,12 +26,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-3s$2o16s^z9%)j3byj+dxfl(t*+pzdkwygsqh0+q8(7-thkqfw'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Set to * during Production setup, will restrict after stable
+ALLOWED_HOSTS = [
+    '*'
+]
 
 
 # Application definition
@@ -81,14 +86,7 @@ WSGI_APPLICATION = 'weather_stats.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT')
-    }
+    'default': dj_database_url.parse(os.getenv('POSTGRESQL_DATABASE_URL'))
 }
 
 
@@ -138,7 +136,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-CELERY_BROKER_URL = os.getenv("WSL_CELERY_BROKER_URL")
+CELERY_BROKER_URL = os.getenv("REDIS_URL")
 CELERY_BEAT_SCHEDULE = {
     'fetch-weather-every-30-seconds' : {
         'task' : 'weather.tasks.fetch_weather_data',
@@ -176,6 +174,12 @@ CELERY_BEAT_SCHEDULE = {
 
 '''
 
-REDIS_HOST = os.getenv('WSL_IP')
-REDIS_PORT = 6379
-REDIS_DB = 0
+REDIS_URL = os.getenv('REDIS_URL')
+parsed_redis_url = urllib.parse.urlparse(REDIS_URL)
+REDIS_CONFIG = {
+    'HOST' : parsed_redis_url.hostname,
+    'PORT' : parsed_redis_url.port,
+    'DB' : int((parsed_redis_url.path or '/0')[1:]),
+    'SSL' : parsed_redis_url.scheme == "rediss"
+}
+
