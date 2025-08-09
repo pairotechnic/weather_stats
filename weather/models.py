@@ -13,3 +13,6 @@ class WeatherData(models.Model):
 
     def __str__(self):
         return f"{self.city} - {self.temperature}°C at {self.measured_at}"
+    
+    class Meta:
+        ordering = ["-measured_at"]
