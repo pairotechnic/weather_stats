@@ -2,5 +2,4 @@
 builder = "NIXPACKS"
 buildCommand = "python manage.py collectstatic --noinput"
 
-[deploy]
-startCommand = "python manage.py migrate && gunicorn weather_stats.wsgi --bind 0.0.0.0:$PORT"
+
