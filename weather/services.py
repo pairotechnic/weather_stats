@@ -73,10 +73,11 @@ def fetch_and_store_all_cities():
                 print(f"Data hasn't been refreshed for {city}. Continuing...")
                 continue
         else :
+            print(f"Redis key missing for {city}")
             # Fallback to database query if Redis is empty ( happens for the very first query, and will happen again if that redis key is deleted )
             last_record = WeatherData.objects.filter(city=city).order_by('-measured_at').first()
             if last_record and weather_data["measured_at"] <= last_record.measured_at:
-                print(f"Redis key missing, and data hasn't been refreshed for {city}. Continuing...")
+                print(f"Also, data hasn't been refreshed for {city}. Continuing...")
                 continue
         
         # Create record and update redis
