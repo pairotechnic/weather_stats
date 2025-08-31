@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 import os
 import dj_database_url
 import urllib.parse
+from celery.schedules import crontab
 
 load_dotenv()
 
@@ -142,10 +143,14 @@ REST_FRAMEWORK = {
 
 CELERY_BROKER_URL = os.getenv("REDIS_URL")
 CELERY_BEAT_SCHEDULE = {
-    'fetch-weather-every-30-seconds' : {
-        'task' : 'weather.tasks.fetch_weather_data',
-        'schedule' : 30.0
-    }
+    'fetch-weather-every-30-seconds': {
+        'task': 'weather.tasks.fetch_weather_data',
+        'schedule': 30.0,
+    },
+    'send-daily-weather-report-at-5pm': {
+        'task': 'weather.tasks.send_daily_report',
+        'schedule': crontab(hour=11, minute=30),
+    },
 }
 
 '''
